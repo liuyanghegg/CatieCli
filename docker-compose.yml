@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  wenxiaobai-api:
+    build: .
+    container_name: wenxiaobai-api
+    ports:
+      - "8080:8080"
+    environment:
+      # 用户只需修改 ACCESS_TOKEN
+      - API_USERNAME=web.1.0.beta
+      - API_SECRET_KEY=TkoWuEN8cpDJubb7Zfwxln16NQDZIc8z
+      - ACCESS_TOKEN=YOUR_ACCESS_TOKEN_HERE
+      # DEVICE_ID 会自动生成，无需填写
+      - PORT=8080
+      - SESSION_DATA_DIR=/app/sessions
+    # 挂载会话数据卷，实现持久化
+    volumes:
+      - wenxiaobai-sessions:/app/sessions
+    restart: unless-stopped
+
+volumes:
+  wenxiaobai-sessions:
+    driver: local
