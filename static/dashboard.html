@@ -277,6 +277,91 @@
             color: #dc3545;
         }
         
+        /* Token 获取指南样式 */
+        .guide-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+            background: #f8f9ff;
+        }
+        
+        .guide-section h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .guide-section ol, .guide-section ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .guide-section li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .code-header {
+            background: #4a5568;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .code-block pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            margin: 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .alert ul {
+            margin: 0.5rem 0 0 1.5rem;
+        }
+        
+        .alert li {
+            margin-bottom: 0.25rem;
+        }
+        
+        kbd {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        
         .actions {
             display: flex;
             gap: 0.5rem;
@@ -333,6 +418,109 @@
                         <tbody id="apiKeysBody">
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Token 获取指南 -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📋 如何获取文小白 Token</h3>
+                <button class="btn btn-info" onclick="toggleTokenGuide()">显示/隐藏指南</button>
+            </div>
+            <div class="card-body" id="tokenGuideContent" style="display: none;">
+                <div class="guide-section">
+                    <h4>🌐 方法一：浏览器获取（推荐）</h4>
+                    <ol>
+                        <li>使用浏览器访问 <a href="https://wenxiaobai.com" target="_blank">文小白官网</a></li>
+                        <li>登录你的文小白账户</li>
+                        <li>按 <kbd>F12</kbd> 打开开发者工具</li>
+                        <li>切换到 <strong>Console（控制台）</strong> 标签</li>
+                        <li>复制并粘贴以下代码，然后按回车：</li>
+                    </ol>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>JavaScript 代码</span>
+                            <div>
+                                <button class="btn btn-info btn-sm" onclick="testTokenScript()">🧪 测试代码</button>
+                                <button class="btn btn-secondary btn-sm" onclick="copyTokenScript()">📋 复制代码</button>
+                            </div>
+                        </div>
+                        <pre id="tokenScript">// 文小白 Token 获取脚本
+(function() {
+    console.log('🔍 正在查找文小白 Token...');
+    
+    // 方法1: 从 Cookie 中获取 login_token
+    const cookieToken = document.cookie.match(/login_token=([^;]+)/)?.[1];
+    
+    // 方法2: 从 localStorage 中获取
+    const localToken = localStorage.getItem('login_token') || localStorage.getItem('access_token');
+    
+    // 方法3: 从 sessionStorage 中获取
+    const sessionToken = sessionStorage.getItem('login_token') || sessionStorage.getItem('access_token');
+    
+    const token = cookieToken || localToken || sessionToken;
+    
+    if (token) {
+        console.log('🎉 找到 Token:', token);
+        console.log('📋 Token 长度:', token.length);
+        console.log('✅ 请复制上面的 Token 到系统中使用');
+        
+        // 尝试自动复制到剪贴板（需要用户交互）
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(token).then(() => {
+                console.log('📋 Token 已自动复制到剪贴板');
+            }).catch(() => {
+                console.log('⚠️ 自动复制失败，请手动复制');
+            });
+        }
+    } else {
+        console.log('❌ 未找到 Token');
+        console.log('💡 请确保：');
+        console.log('   1. 已正确登录文小白网站');
+        console.log('   2. 当前页面是文小白的域名');
+        console.log('   3. 尝试刷新页面后重新执行');
+    }
+})();</pre>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>💡 提示：</strong>
+                        <ul>
+                            <li>执行代码后，控制台会显示你的 Token</li>
+                            <li>复制显示的 Token 并粘贴到下面的"添加 Token"中</li>
+                            <li>如果显示"未找到 Token"，请确保已正确登录文小白</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="guide-section">
+                    <h4>📱 方法二：移动端获取</h4>
+                    <ol>
+                        <li>在手机浏览器中访问文小白并登录</li>
+                        <li>使用浏览器的开发者工具（如 Chrome 的远程调试）</li>
+                        <li>或者使用抓包工具获取请求头中的 Authorization</li>
+                    </ol>
+                </div>
+                
+                <div class="guide-section">
+                    <h4>🔧 方法三：网络抓包</h4>
+                    <ol>
+                        <li>使用 Fiddler、Charles 等抓包工具</li>
+                        <li>访问文小白网站并登录</li>
+                        <li>在请求头中查找 <code>Authorization</code> 或 <code>login_token</code></li>
+                    </ol>
+                </div>
+                
+                <div class="guide-section">
+                    <h4>⚠️ 注意事项</h4>
+                    <ul>
+                        <li><strong>Token 安全：</strong>请妥善保管你的 Token，不要泄露给他人</li>
+                        <li><strong>Token 有效期：</strong>Token 可能会过期，需要重新获取</li>
+                        <li><strong>账户安全：</strong>建议定期更换 Token</li>
+                        <li><strong>使用限制：</strong>请遵守文小白的使用条款</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -1084,6 +1272,66 @@
                 console.error('Batch check selected balance error:', error);
                 showAlert('网络错误，请稍后重试');
             }
+        }
+        
+        // Token 获取指南相关函数
+        function toggleTokenGuide() {
+            const content = document.getElementById('tokenGuideContent');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+            } else {
+                content.style.display = 'none';
+            }
+        }
+        
+        function copyTokenScript() {
+            const script = document.getElementById('tokenScript').textContent;
+            
+            // 创建临时文本区域
+            const textarea = document.createElement('textarea');
+            textarea.value = script;
+            document.body.appendChild(textarea);
+            
+            // 选择并复制文本
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // 兼容移动设备
+            
+            try {
+                document.execCommand('copy');
+                showAlert('✅ 代码已复制到剪贴板！请在文小白网站的控制台中粘贴执行', 'success');
+                
+                // 显示详细说明
+                setTimeout(() => {
+                    showAlert('💡 使用说明：1. 访问文小白网站并登录 2. 按F12打开开发者工具 3. 切换到Console标签 4. 粘贴代码并按回车', 'success');
+                }, 3000);
+            } catch (err) {
+                // 如果复制失败，显示手动复制提示
+                showAlert('请手动复制代码：选中代码文本，然后按 Ctrl+C (Windows) 或 Cmd+C (Mac)', 'error');
+            }
+            
+            // 清理临时元素
+            document.body.removeChild(textarea);
+        }
+        
+        function testTokenScript() {
+            console.log('🧪 在当前页面测试 Token 获取代码...');
+            
+            // 执行Token获取逻辑（在当前页面测试）
+            const cookieToken = document.cookie.match(/login_token=([^;]+)/)?.[1];
+            const localToken = localStorage.getItem('login_token') || localStorage.getItem('access_token');
+            const sessionToken = sessionStorage.getItem('login_token') || sessionStorage.getItem('access_token');
+            
+            const token = cookieToken || localToken || sessionToken;
+            
+            if (token) {
+                console.log('🎉 在当前页面找到 Token:', token);
+                showAlert('✅ 代码测试成功！在控制台中找到了Token（当前页面的）', 'success');
+            } else {
+                console.log('ℹ️ 当前页面未找到 Token（这是正常的，因为这不是文小白网站）');
+                showAlert('ℹ️ 代码测试正常！当前页面没有文小白Token（这是正常的）。请在文小白网站使用此代码。', 'success');
+            }
+            
+            showAlert('💡 请打开浏览器控制台查看详细测试结果', 'success');
         }
         
         // 页面加载时初始化
