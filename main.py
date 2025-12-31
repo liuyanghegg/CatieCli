@@ -178,9 +178,20 @@ except Exception as e:
     api_secret_key = "TkoWuEN8cpDJubb7Zfwxln16NQDZIc8z"
     device_id = f"{random.randint(1000000000000000000, 9999999999999999999)}_{int(datetime.now().timestamp() * 1000)}_{random.randint(100000, 999999)}"
 
-# 会话存储配置
+# 目录配置
 SESSION_DATA_DIR = os.environ.get("SESSION_DATA_DIR", "./sessions")
+DATABASE_PATH = os.environ.get("DATABASE_PATH", "./wenxiaobai_users.db")
+LOG_DIR = os.environ.get("LOG_DIR", "./logs")
+
+# 创建必要的目录
 Path(SESSION_DATA_DIR).mkdir(parents=True, exist_ok=True)
+Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
+
+# 确保数据库目录存在
+database_dir = os.path.dirname(DATABASE_PATH)
+if database_dir:
+    Path(database_dir).mkdir(parents=True, exist_ok=True)
+
 session_storage_file = os.path.join(SESSION_DATA_DIR, "sessions.json")
 
 def load_sessions():

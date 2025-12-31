@@ -11,6 +11,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # 安装系统依赖
 RUN apt-get update && apt-get install -y \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # 复制依赖文件并安装
@@ -22,7 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY . .
 
 # 创建必要的目录
-RUN mkdir -p /app/sessions /app/logs
+RUN mkdir -p /app/sessions /app/logs /app/data
 
 # 设置权限
 RUN chmod +x /app
