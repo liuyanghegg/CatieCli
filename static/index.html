@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WenXiaoBai API 代理服务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        h1 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        .api-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .api-info h2 {
+            margin: 0 0 10px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .endpoint code {
+            font-family: 'Courier New', monospace;
+            background: #2d3748;
+            color: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .endpoint .method {
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .endpoint .url {
+            color: #764ba2;
+            font-size: 0.9em;
+        }
+        .note {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .status.success {
+            background: rgba(34, 197, 94, 0.1);
+        }
+        .status.error {
+            background: rgba(220, 53, 69, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐱 WenXiaoBai API 代理服务</h1>
+        
+        <div class="api-info">
+            <h2>📡 API 端点</h2>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="url">/v1/models</span>
+            </div>
+            <div class="endpoint">
+                <span class="method">POST</span>
+                <span class="url">/v1/chat/completions</span>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="url">/v1/tasks/available</span>
+            </div>
+            <div class="endpoint">
+                <span class="method">POST</span>
+                <span class="url">/api/tasks/toggle-auto-task</span>
+            </div>
+            <div class="endpoint">
+                <span class="method">POST</span>
+                <span class="url">/api/tasks/query-balance</span>
+            </div>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="url">/health</span>
+            </div>
+            <p class="note">注意：所有 API 请求需要在 Header 中包含 Authorization: Bearer YOUR_TOKEN</p>
+        </div>
+        
+        <div class="api-info">
+            <h2>🧄 蒜粒系统</h2>
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="url">/api/tasks/available</span>
+            </div>
+            <p class="note">启用自动任务后，系统会自动从问小白同步余额（每天最多200次）</p>
+        </div>
+        
+        <div class="api-info">
+            <h2>📋 使用说明</h2>
+            <p>1. 获取 access_token：登录 https://www.wenxiaobai.com/，按 F12 打开开发者工具，切换到"应用"标签页，找到 Cookie 中的 login_token 值</p>
+            <p>2. 添加凭证：在凭证管理页面填写 access_token（username 和 secret_key 使用默认值）</p>
+            <p>3. 启用自动任务：在任务中心点击"启用自动任务恢复"</p>
+        </div>
+        
+        <div id="status" class="status">
+            <h3>🔍 API 状态检查</h3>
+            <p>正在检查 API 服务状态...</p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <button onclick="checkHealth()">🔄 检查服务状态</button>
+        </div>
+        
+        <script>
+            async function checkHealth() {
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = '<h3>🔍 API 状态检查</h3><p>正在检查 API 服务状态...</p>';
+                
+                try {
+                    const response = await fetch('/health');
+                    const data = await response.json();
+                    
+                    if (data.status === 'ok') {
+                        statusDiv.className = 'status success';
+                        statusDiv.innerHTML = `
+                            <h3>✅ 服务正常运行</h3>
+                            <p><strong>服务名称：</strong>${data.service}</p>
+                            <p><strong>版本：</strong>${data.version}</p>
+                            <p><strong>状态：</strong>正常运行</p>
+                        `;
+                    } else {
+                        statusDiv.className = 'status error';
+                        statusDiv.innerHTML = `
+                            <h3>❌ 服务异常</h3>
+                            <p><strong>错误信息：</strong>${data.status || '未知错误'}</p>
+                        `;
+                    }
+                } catch (error) {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = `
+                        <h3>❌ 无法连接到服务</h3>
+                            <p><strong>错误：</strong>${error.message}</p>
+                        `;
+                }
+            }
+            
+            // 页面加载时自动检查
+            window.addEventListener('load', checkHealth);
+        </script>
+</body>
+</html>

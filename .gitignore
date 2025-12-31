@@ -33,13 +33,46 @@ ENV/
 
 # 环境变量
 .env
+.env.local
+.env.*.local
 
-# 会话数据（Docker 部署时使用卷挂载）
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3
+
+# 会话数据
 sessions/
-*.json
 
-# 测试
-*.pyc
+# 日志文件
+logs/
+*.log
+
+# 测试文件
+test_*.py
+*_test.py
+tests/
 .pytest_cache/
 .coverage
 htmlcov/
+.hypothesis/
+
+# 临时文件
+*.tmp
+*.temp
+temp/
+tmp/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 项目特定
+ADMIN_FEATURES_COMPLETE.md
+SYSTEM_COMPLETE.md
+ENHANCED_SYSTEM_COMPLETE.md

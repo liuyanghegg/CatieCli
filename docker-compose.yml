@@ -3,22 +3,43 @@ version: '3.8'
 services:
   wenxiaobai-api:
     build: .
-    container_name: wenxiaobai-api
+    container_name: wenxiaobai-api-proxy
     ports:
       - "8080:8080"
     environment:
-      # 用户只需修改 ACCESS_TOKEN
+      # WenXiaoBai API 配置
       - API_USERNAME=web.1.0.beta
       - API_SECRET_KEY=TkoWuEN8cpDJubb7Zfwxln16NQDZIc8z
-      - ACCESS_TOKEN=YOUR_ACCESS_TOKEN_HERE
-      # DEVICE_ID 会自动生成，无需填写
+      - ACCESS_TOKEN=${ACCESS_TOKEN:-YOUR_ACCESS_TOKEN_HERE}
+      - DEVICE_ID=${DEVICE_ID:-}
+      
+      # 服务配置
       - PORT=8080
+      - FLASK_ENV=production
       - SESSION_DATA_DIR=/app/sessions
-    # 挂载会话数据卷，实现持久化
+      
+      # 数据库配置
+      - DATABASE_PATH=/app/data/wenxiaobai_users.db
+      
     volumes:
+      # 持久化数据
       - wenxiaobai-sessions:/app/sessions
+      - wenxiaobai-data:/app/data
+      - wenxiaobai-logs:/app/logs
+      
     restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   wenxiaobai-sessions:
+    driver: local
+  wenxiaobai-data:
+    driver: local
+  wenxiaobai-logs:
     driver: local

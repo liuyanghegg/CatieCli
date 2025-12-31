@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员控制台 - WenXiaoBai API 管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .admin-badge {
+            background: #dc3545;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #764ba2;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .alert.success {
+            background: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .balance {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .balance.low {
+            color: #dc3545;
+        }
+        
+        .batch-actions {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .batch-actions.show {
+            display: block;
+        }
+        
+        .checkbox-group {
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-group label {
+            margin-left: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🐱 WenXiaoBai API <span class="admin-badge">管理员</span></div>
+        <div class="user-info">
+            <span id="username">加载中...</span>
+            <button class="btn btn-secondary" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div id="alert" class="alert"></div>
+        
+        <!-- 系统统计 -->
+        <div class="card">
+            <div class="card-header">
+                <h3>系统概览</h3>
+                <button class="btn btn-primary" onclick="loadStats()">刷新统计</button>
+            </div>
+            <div class="card-body">
+                <div id="statsLoading" class="loading">
+                    <div class="spinner"></div>
+                    加载统计数据...
+                </div>
+                <div id="statsGrid" class="stats-grid" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">总用户数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="activeUsers">0</div>
+                        <div class="stat-label">活跃用户</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="adminUsers">0</div>
+                        <div class="stat-label">管理员</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户管理 -->
+        <div class="card">
+            <div class="card-header">
+                <h3>用户管理</h3>
+                <button class="btn btn-primary" onclick="loadUsers()">刷新用户列表</button>
+            </div>
+            <div class="card-body">
+                <div id="usersLoading" class="loading">
+                    <div class="spinner"></div>
+                    加载用户数据...
+                </div>
+                <div id="usersTable" style="display: none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>角色</th>
+                                <th>状态</th>
+                                <th>注册时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Token管理 -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Token管理</h3>
+                <div>
+                    <button class="btn btn-primary" onclick="showCreateTokenModal()">添加Token</button>
+                    <button class="btn btn-success" onclick="loadTokens()">刷新Token列表</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="batch-actions" id="tokenBatchActions">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="selectAllTokens" onchange="toggleSelectAllTokens()">
+                        <label for="selectAllTokens">全选</label>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="batchToggleTokens()">批量启用/禁用</button>
+                        <button class="btn btn-warning" onclick="batchToggleAutoTask()">批量切换自动任务</button>
+                        <button class="btn btn-danger" onclick="batchDeleteTokens()">批量删除</button>
+                    </div>
+                </div>
+                
+                <div id="tokensLoading" class="loading">
+                    <div class="spinner"></div>
+                    加载Token数据...
+                </div>
+                <div id="tokensTable" style="display: none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" onchange="toggleTokenBatchMode(this.checked)">
+                                </th>
+                                <th>ID</th>
+                                <th>用户</th>
+                                <th>名称</th>
+                                <th>文小白用户</th>
+                                <th>余额</th>
+                                <th>状态</th>
+                                <th>自动任务</th>
+                                <th>今日调用</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tokensBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 用户详情模态框 -->
+    <div id="userDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>用户详情</h3>
+                <span class="close" onclick="closeModal('userDetailModal')">&times;</span>
+            </div>
+            <div id="userDetailContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    加载用户详情...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 创建Token模态框 -->
+    <div id="createTokenModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加Token</h3>
+                <span class="close" onclick="closeModal('createTokenModal')">&times;</span>
+            </div>
+            <form id="createTokenForm">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="tokenUserId" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">选择用户</label>
+                    <select id="tokenUserId" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="">请选择用户</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="tokenName" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Token名称</label>
+                    <input type="text" id="tokenName" required placeholder="例如：主账号" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="tokenValue" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Token值</label>
+                    <textarea id="tokenValue" required placeholder="粘贴文小白access_token" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 100px; resize: vertical;"></textarea>
+                </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="tokenDeviceId" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">设备ID（可选）</label>
+                    <input type="text" id="tokenDeviceId" placeholder="设备ID" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                <button type="submit" class="btn btn-primary">添加Token</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        let allUsers = [];
+        let allTokens = [];
+        let selectedTokens = [];
+        
+        // 初始化
+        async function init() {
+            await checkAuth();
+            await loadStats();
+            await loadUsers();
+            await loadTokens();
+        }
+        
+        // 基础功能
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/me');
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                const data = await response.json();
+                if (!data.user.is_admin) {
+                    window.location.href = '/dashboard.html';
+                    return;
+                }
+                
+                currentUser = data.user;
+                document.getElementById('username').textContent = data.user.username;
+            } catch (error) {
+                window.location.href = '/login.html';
+            }
+        }
+        
+        // 显示提示信息
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        // 加载系统统计
+        async function loadStats() {
+            try {
+                document.getElementById('statsLoading').style.display = 'block';
+                document.getElementById('statsGrid').style.display = 'none';
+                
+                const response = await fetch('/api/admin/stats');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('totalUsers').textContent = data.total_users;
+                    document.getElementById('activeUsers').textContent = data.active_users;
+                    document.getElementById('adminUsers').textContent = data.admin_users;
+                } else {
+                    showAlert(data.error || '加载统计数据失败');
+                }
+            } catch (error) {
+                console.error('Load stats error:', error);
+                showAlert('网络错误，请稍后重试');
+            } finally {
+                document.getElementById('statsLoading').style.display = 'none';
+                document.getElementById('statsGrid').style.display = 'grid';
+            }
+        }
+        
+        // 加载用户列表
+        async function loadUsers() {
+            try {
+                document.getElementById('usersLoading').style.display = 'block';
+                document.getElementById('usersTable').style.display = 'none';
+                
+                const response = await fetch('/api/admin/users');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    allUsers = data.users;
+                    renderUsers();
+                    updateUserSelect();
+                } else {
+                    showAlert(data.error || '加载用户列表失败');
+                }
+            } catch (error) {
+                console.error('Load users error:', error);
+                showAlert('网络错误，请稍后重试');
+            } finally {
+                document.getElementById('usersLoading').style.display = 'none';
+                document.getElementById('usersTable').style.display = 'block';
+            }
+        }
+        
+        // 渲染用户列表
+        function renderUsers() {
+            const tbody = document.getElementById('usersBody');
+            tbody.innerHTML = '';
+            
+            allUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email || '未设置'}</td>
+                    <td>
+                        <span class="badge ${user.is_admin ? 'badge-warning' : 'badge-success'}">
+                            ${user.is_admin ? '管理员' : '普通用户'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">
+                            ${user.is_active ? '活跃' : '禁用'}
+                        </span>
+                    </td>
+                    <td>${new Date(user.created_at).toLocaleString()}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-info" onclick="showUserDetail(${user.id})">详情</button>
+                            ${!user.is_admin ? `
+                                <button class="btn btn-secondary" onclick="toggleUser(${user.id})">
+                                    ${user.is_active ? '禁用' : '启用'}
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteUser(${user.id})">删除</button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 更新用户选择下拉框
+        function updateUserSelect() {
+            const select = document.getElementById('tokenUserId');
+            select.innerHTML = '<option value="">请选择用户</option>';
+            
+            allUsers.forEach(user => {
+                if (!user.is_admin) {  // 只显示非管理员用户
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = `${user.username} (ID: ${user.id})`;
+                    select.appendChild(option);
+                }
+            });
+        }
+        
+        // 加载Token列表
+        async function loadTokens() {
+            try {
+                document.getElementById('tokensLoading').style.display = 'block';
+                document.getElementById('tokensTable').style.display = 'none';
+                
+                const response = await fetch('/api/admin/tokens');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    allTokens = data.tokens;
+                    renderTokens();
+                } else {
+                    showAlert(data.error || '加载Token列表失败');
+                }
+            } catch (error) {
+                console.error('Load tokens error:', error);
+                showAlert('网络错误，请稍后重试');
+            } finally {
+                document.getElementById('tokensLoading').style.display = 'none';
+                document.getElementById('tokensTable').style.display = 'block';
+            }
+        }
+        
+        // 渲染Token列表
+        function renderTokens() {
+            const tbody = document.getElementById('tokensBody');
+            tbody.innerHTML = '';
+            
+            allTokens.forEach(token => {
+                const row = document.createElement('tr');
+                const balanceClass = token.balance < 10 ? 'balance low' : 'balance';
+                
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" value="${token.id}" onchange="updateSelectedTokens()">
+                    </td>
+                    <td>${token.id}</td>
+                    <td>${token.username}</td>
+                    <td>${token.name}</td>
+                    <td>${token.wenxiaobai_username || '未知'}</td>
+                    <td>
+                        <span class="${balanceClass}">${token.balance.toFixed(6)} 蒜粒</span>
+                    </td>
+                    <td>
+                        <span class="badge ${token.is_active ? 'badge-success' : 'badge-danger'}">
+                            ${token.is_active ? '启用' : '禁用'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${token.auto_task_enabled ? 'badge-success' : 'badge-danger'}">
+                            ${token.auto_task_enabled ? '已启用' : '已禁用'}
+                        </span>
+                    </td>
+                    <td>${token.api_calls_today || 0} 次</td>
+                    <td>${new Date(token.created_at).toLocaleString()}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-secondary" onclick="toggleToken(${token.id})">
+                                ${token.is_active ? '禁用' : '启用'}
+                            </button>
+                            <button class="btn btn-warning" onclick="toggleTokenAutoTask(${token.id})">
+                                ${token.auto_task_enabled ? '禁用任务' : '启用任务'}
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteToken(${token.id})">删除</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 显示创建Token模态框
+        function showCreateTokenModal() {
+            document.getElementById('createTokenModal').style.display = 'block';
+        }
+        
+        // 用户操作
+        async function toggleUser(userId) {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/toggle`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('用户状态已更新', 'success');
+                    await loadUsers();
+                } else {
+                    showAlert(data.error || '操作失败');
+                }
+            } catch (error) {
+                console.error('Toggle user error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        async function deleteUser(userId) {
+            if (!confirm('确定要删除这个用户吗？这将删除用户的所有相关数据！')) return;
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('用户已删除', 'success');
+                    await loadUsers();
+                    await loadTokens();  // 刷新Token列表
+                } else {
+                    showAlert(data.error || '删除失败');
+                }
+            } catch (error) {
+                console.error('Delete user error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // Token操作
+        async function toggleToken(tokenId) {
+            try {
+                const response = await fetch(`/api/admin/tokens/${tokenId}/toggle`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Token状态已更新', 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '操作失败');
+                }
+            } catch (error) {
+                console.error('Toggle token error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        async function toggleTokenAutoTask(tokenId) {
+            try {
+                const response = await fetch(`/api/admin/tokens/${tokenId}/toggle-auto-task`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('自动任务状态已更新', 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '操作失败');
+                }
+            } catch (error) {
+                console.error('Toggle auto task error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        async function deleteToken(tokenId) {
+            if (!confirm('确定要删除这个Token吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/admin/tokens/${tokenId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Token已删除', 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '删除失败');
+                }
+            } catch (error) {
+                console.error('Delete token error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 批量操作
+        function toggleTokenBatchMode(enabled) {
+            const batchActions = document.getElementById('tokenBatchActions');
+            if (enabled) {
+                batchActions.classList.add('show');
+            } else {
+                batchActions.classList.remove('show');
+                const checkboxes = document.querySelectorAll('input[type="checkbox"][value]');
+                checkboxes.forEach(cb => cb.checked = false);
+                updateSelectedTokens();
+            }
+        }
+        
+        function updateSelectedTokens() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][value]:checked');
+            selectedTokens = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        }
+        
+        function toggleSelectAllTokens() {
+            const selectAll = document.getElementById('selectAllTokens');
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][value]');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateSelectedTokens();
+        }
+        
+        async function batchToggleTokens() {
+            if (selectedTokens.length === 0) {
+                showAlert('请选择要操作的Token');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/tokens/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'toggle', token_ids: selectedTokens })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`批量操作成功，影响 ${data.affected} 个Token`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '批量操作失败');
+                }
+            } catch (error) {
+                console.error('Batch toggle error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        async function batchToggleAutoTask() {
+            if (selectedTokens.length === 0) {
+                showAlert('请选择要操作的Token');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/tokens/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'toggle-auto-task', token_ids: selectedTokens })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`批量切换自动任务成功，影响 ${data.affected} 个Token`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '批量操作失败');
+                }
+            } catch (error) {
+                console.error('Batch toggle auto task error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }Task() {
+            if (selectedTokens.length === 0) {
+                showAlert('请选择要操作的Token');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/tokens/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'toggle-auto-task', token_ids: selectedTokens })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`批量切换自动任务成功，影响 ${data.affected} 个Token`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '批量操作失败');
+                }
+            } catch (error) {
+                console.error('Batch toggle auto task error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        async function batchDeleteTokens() {
+            if (selectedTokens.length === 0) {
+                showAlert('请选择要删除的Token');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${selectedTokens.length} 个Token吗？`)) return;
+            
+            try {
+                const response = await fetch('/api/admin/tokens/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'delete', token_ids: selectedTokens })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`批量删除成功，删除了 ${data.affected} 个Token`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '批量删除失败');
+                }
+            } catch (error) {
+                console.error('Batch delete error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 创建Token表单
+        document.getElementById('createTokenForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const userId = document.getElementById('tokenUserId').value;
+            const name = document.getElementById('tokenName').value;
+            const token = document.getElementById('tokenValue').value;
+            const deviceId = document.getElementById('tokenDeviceId').value;
+            
+            try {
+                showAlert('正在验证Token...', 'success');
+                
+                const response = await fetch('/api/admin/tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: parseInt(userId), 
+                        name, 
+                        token, 
+                        device_id: deviceId 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`Token添加成功！文小白用户：${data.wenxiaobai_username}，余额：${data.balance.toFixed(6)} 蒜粒`, 'success');
+                    closeModal('createTokenModal');
+                    document.getElementById('createTokenForm').reset();
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '添加失败');
+                }
+            } catch (error) {
+                console.error('Create token error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        });
+        
+        // 显示用户详情
+        async function showUserDetail(userId) {
+            try {
+                document.getElementById('userDetailModal').style.display = 'block';
+                document.getElementById('userDetailContent').innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        加载用户详情...
+                    </div>
+                `;
+                
+                const user = allUsers.find(u => u.id === userId);
+                if (!user) {
+                    showAlert('用户不存在');
+                    closeModal('userDetailModal');
+                    return;
+                }
+                
+                const response = await fetch(`/api/admin/users/${userId}/tokens`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    renderUserDetail(user, data.tokens);
+                } else {
+                    showAlert(data.error || '加载用户详情失败');
+                    closeModal('userDetailModal');
+                }
+            } catch (error) {
+                console.error('Show user detail error:', error);
+                showAlert('网络错误，请稍后重试');
+                closeModal('userDetailModal');
+            }
+        }
+        
+        // 渲染用户详情
+        function renderUserDetail(user, tokens) {
+            const content = document.getElementById('userDetailContent');
+            
+            const totalTokens = tokens.length;
+            const activeTokens = tokens.filter(t => t.is_active).length;
+            const totalBalance = tokens.reduce((sum, t) => sum + (t.balance || 0), 0);
+            
+            content.innerHTML = `
+                <div style="margin-bottom: 2rem;">
+                    <h4>用户信息</h4>
+                    <p><strong>ID:</strong> ${user.id}</p>
+                    <p><strong>用户名:</strong> ${user.username}</p>
+                    <p><strong>邮箱:</strong> ${user.email || '未设置'}</p>
+                    <p><strong>角色:</strong> ${user.is_admin ? '管理员' : '普通用户'}</p>
+                    <p><strong>状态:</strong> ${user.is_active ? '活跃' : '禁用'}</p>
+                    <p><strong>注册时间:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <h4>Token统计</h4>
+                    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                            <div class="stat-number">${totalTokens}</div>
+                            <div class="stat-label">总Token数</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);">
+                            <div class="stat-number">${activeTokens}</div>
+                            <div class="stat-label">活跃Token</div>
+                        </div>
+                        <div class="stat-card" style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);">
+                            <div class="stat-number">${totalBalance.toFixed(2)}</div>
+                            <div class="stat-label">总余额(蒜粒)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4>Token列表</h4>
+                    ${tokens.length > 0 ? `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>文小白用户</th>
+                                    <th>余额</th>
+                                    <th>状态</th>
+                                    <th>自动任务</th>
+                                    <th>今日调用</th>
+                                    <th>创建时间</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tokens.map(token => `
+                                    <tr>
+                                        <td>${token.name}</td>
+                                        <td>${token.wenxiaobai_username || '未知'}</td>
+                                        <td>
+                                            <span class="balance ${token.balance < 10 ? 'low' : ''}">
+                                                ${token.balance.toFixed(6)} 蒜粒
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge ${token.is_active ? 'badge-success' : 'badge-danger'}">
+                                                ${token.is_active ? '启用' : '禁用'}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge ${token.auto_task_enabled ? 'badge-success' : 'badge-danger'}">
+                                                ${token.auto_task_enabled ? '已启用' : '已禁用'}
+                                            </span>
+                                        </td>
+                                        <td>${token.api_calls_today || 0} 次</td>
+                                        <td>${new Date(token.created_at).toLocaleString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : '<p>该用户暂无Token</p>'}
+                </div>
+            `;
+        }
+        
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 页面加载时初始化
+        init();
+    </script>
+</body>
+</html>

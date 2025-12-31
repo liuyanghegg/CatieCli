@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户控制台 - WenXiaoBai API 管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #764ba2;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .alert.success {
+            background: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .balance {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .balance.low {
+            color: #dc3545;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .batch-actions {
+            display: none;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .batch-actions.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🐱 WenXiaoBai API</div>
+        <div class="user-info">
+            <span id="username">加载中...</span>
+            <button class="btn btn-secondary" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div id="alert" class="alert"></div>
+        
+        <!-- API Keys 管理 -->
+        <div class="card">
+            <div class="card-header">
+                <h3>API Keys 管理</h3>
+                <button class="btn btn-primary" onclick="showCreateApiKeyModal()">创建 API Key</button>
+            </div>
+            <div class="card-body">
+                <div id="apiKeysLoading" class="loading">
+                    <div class="spinner"></div>
+                    加载中...
+                </div>
+                <div id="apiKeysTable" style="display: none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th>API Key</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="apiKeysBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tokens 管理 -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Tokens 管理</h3>
+                <div>
+                    <button class="btn btn-info" onclick="showModelsModal()">查看可用模型</button>
+                    <button class="btn btn-success" onclick="batchCheckBalance()">批量查询余额</button>
+                    <button class="btn btn-primary" onclick="showCreateTokenModal()">添加 Token</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="batch-actions" id="batchActions">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                        <label for="selectAll">全选</label>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-secondary" onclick="batchToggleTokens()">批量启用/禁用</button>
+                        <button class="btn btn-danger" onclick="batchDeleteTokens()">批量删除</button>
+                        <button class="btn btn-success" onclick="batchCheckSelectedBalance()">查询选中余额</button>
+                    </div>
+                </div>
+                
+                <div id="tokensLoading" class="loading">
+                    <div class="spinner"></div>
+                    加载中...
+                </div>
+                <div id="tokensTable" style="display: none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" onchange="toggleBatchMode(this.checked)">
+                                </th>
+                                <th>名称</th>
+                                <th>Token</th>
+                                <th>余额</th>
+                                <th>状态</th>
+                                <th>自动任务</th>
+                                <th>今日调用</th>
+                                <th>最后检查</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tokensBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 创建 API Key 模态框 -->
+    <div id="createApiKeyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>创建 API Key</h3>
+                <span class="close" onclick="closeModal('createApiKeyModal')">&times;</span>
+            </div>
+            <form id="createApiKeyForm">
+                <div class="form-group">
+                    <label for="apiKeyName">API Key 名称</label>
+                    <input type="text" id="apiKeyName" required placeholder="例如：我的应用">
+                </div>
+                <button type="submit" class="btn btn-primary">创建</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 可用模型模态框 -->
+    <div id="modelsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>可用模型列表</h3>
+                <span class="close" onclick="closeModal('modelsModal')">&times;</span>
+            </div>
+            <div id="modelsContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    加载模型列表...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 创建 Token 模态框 -->
+    <div id="createTokenModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>添加 Token</h3>
+                <span class="close" onclick="closeModal('createTokenModal')">&times;</span>
+            </div>
+            <form id="createTokenForm">
+                <div class="form-group">
+                    <label for="tokenName">Token 名称</label>
+                    <input type="text" id="tokenName" required placeholder="例如：主账号">
+                </div>
+                <div class="form-group">
+                    <label for="tokenValue">Token 值</label>
+                    <textarea id="tokenValue" required placeholder="粘贴您的文小白 access_token"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="deviceId">设备 ID（可选）</label>
+                    <input type="text" id="deviceId" placeholder="设备 ID">
+                </div>
+                <button type="submit" class="btn btn-primary">添加</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let currentUser = null;
+        let apiKeys = [];
+        let tokens = [];
+        let selectedTokens = [];
+        
+        // 初始化
+        async function init() {
+            await checkAuth();
+            await loadApiKeys();
+            await loadTokens();
+        }
+        
+        // 检查认证状态
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/me');
+                if (!response.ok) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                const data = await response.json();
+                currentUser = data.user;
+                document.getElementById('username').textContent = currentUser.username;
+            } catch (error) {
+                window.location.href = '/login.html';
+            }
+        }
+        
+        // 显示提示信息
+        function showAlert(message, type = 'error') {
+            const alert = document.getElementById('alert');
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        // 退出登录
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+        
+        // 加载 API Keys
+        async function loadApiKeys() {
+            try {
+                const response = await fetch('/api/keys');
+                const data = await response.json();
+                apiKeys = data.api_keys;
+                renderApiKeys();
+            } catch (error) {
+                console.error('Load API keys error:', error);
+                showAlert('加载 API Keys 失败');
+            } finally {
+                document.getElementById('apiKeysLoading').style.display = 'none';
+                document.getElementById('apiKeysTable').style.display = 'block';
+            }
+        }
+        
+        // 渲染 API Keys
+        function renderApiKeys() {
+            const tbody = document.getElementById('apiKeysBody');
+            tbody.innerHTML = '';
+            
+            apiKeys.forEach(key => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${key.name}</td>
+                    <td><code>${key.api_key}</code></td>
+                    <td>
+                        <span class="badge ${key.is_active ? 'badge-success' : 'badge-danger'}">
+                            ${key.is_active ? '启用' : '禁用'}
+                        </span>
+                    </td>
+                    <td>${new Date(key.created_at).toLocaleString()}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-secondary" onclick="toggleApiKey(${key.id})">
+                                ${key.is_active ? '禁用' : '启用'}
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteApiKey(${key.id})">删除</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 加载 Tokens
+        async function loadTokens() {
+            try {
+                const response = await fetch('/api/tokens');
+                const data = await response.json();
+                tokens = data.tokens;
+                renderTokens();
+            } catch (error) {
+                console.error('Load tokens error:', error);
+                showAlert('加载 Tokens 失败');
+            } finally {
+                document.getElementById('tokensLoading').style.display = 'none';
+                document.getElementById('tokensTable').style.display = 'block';
+            }
+        }
+        
+        // 渲染 Tokens
+        function renderTokens() {
+            const tbody = document.getElementById('tokensBody');
+            tbody.innerHTML = '';
+            
+            tokens.forEach(token => {
+                const row = document.createElement('tr');
+                const balanceClass = token.balance < 10 ? 'balance low' : 'balance';
+                
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" value="${token.id}" onchange="updateSelectedTokens()">
+                    </td>
+                    <td>${token.name}</td>
+                    <td><code>${token.token}</code></td>
+                    <td>
+                        <span class="${balanceClass}">${token.balance.toFixed(6)} 蒜粒</span>
+                    </td>
+                    <td>
+                        <span class="badge ${token.is_active ? 'badge-success' : 'badge-danger'}">
+                            ${token.is_active ? '启用' : '禁用'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${token.auto_task_enabled ? 'badge-success' : 'badge-danger'}">
+                            ${token.auto_task_enabled ? '已启用' : '已禁用'}
+                        </span>
+                    </td>
+                    <td>${token.api_calls_today || 0} 次</td>
+                    <td>${token.last_balance_check ? new Date(token.last_balance_check).toLocaleString() : '未检查'}</td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-info" onclick="testTokenAPI(${token.id})" title="测试API">🔧</button>
+                            <button class="btn btn-success" onclick="checkBalance(${token.id})">查询余额</button>
+                            <button class="btn btn-warning" onclick="toggleAutoTask(${token.id})">
+                                ${token.auto_task_enabled ? '禁用任务' : '启用任务'}
+                            </button>
+                            <button class="btn btn-secondary" onclick="toggleToken(${token.id})">
+                                ${token.is_active ? '禁用' : '启用'}
+                            </button>
+                            <button class="btn btn-danger" onclick="deleteToken(${token.id})">删除</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 显示创建 API Key 模态框
+        function showCreateApiKeyModal() {
+            document.getElementById('createApiKeyModal').style.display = 'block';
+        }
+        
+        // 显示创建 Token 模态框
+        function showCreateTokenModal() {
+            document.getElementById('createTokenModal').style.display = 'block';
+        }
+        
+        // 显示可用模型
+        function showModelsModal() {
+            document.getElementById('modelsModal').style.display = 'block';
+            loadModels();
+        }
+        
+        // 加载可用模型
+        async function loadModels() {
+            try {
+                const response = await fetch('/api/models');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    renderModels(data.models);
+                } else {
+                    document.getElementById('modelsContent').innerHTML = '<p>加载模型失败</p>';
+                }
+            } catch (error) {
+                console.error('Load models error:', error);
+                document.getElementById('modelsContent').innerHTML = '<p>网络错误</p>';
+            }
+        }
+        
+        // 渲染模型列表
+        function renderModels(models) {
+            const content = document.getElementById('modelsContent');
+            
+            let html = '<div style="max-height: 400px; overflow-y: auto;">';
+            html += '<table class="table">';
+            html += '<thead><tr><th>模型ID</th><th>描述</th><th>能力</th></tr></thead>';
+            html += '<tbody>';
+            
+            models.forEach(model => {
+                html += `
+                    <tr>
+                        <td><code>${model.id}</code></td>
+                        <td>${model.description || '暂无描述'}</td>
+                        <td>${model.abilities.join(', ') || '暂无'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table></div>';
+            content.innerHTML = html;
+        }
+        
+        // 测试Token API
+        async function testTokenAPI(tokenId) {
+            try {
+                showAlert('正在测试API...', 'success');
+                
+                const response = await fetch(`/api/tokens/${tokenId}/test-api`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('API测试成功！Token可正常使用', 'success');
+                } else {
+                    showAlert(data.error || 'API测试失败');
+                }
+            } catch (error) {
+                console.error('Test API error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 切换自动任务
+        async function toggleAutoTask(tokenId) {
+            try {
+                const response = await fetch(`/api/tokens/${tokenId}/toggle-auto-task`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('自动任务状态已更新', 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '操作失败');
+                }
+            } catch (error) {
+                console.error('Toggle auto task error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 创建 API Key
+        document.getElementById('createApiKeyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('apiKeyName').value;
+            
+            try {
+                const response = await fetch('/api/keys', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('API Key 创建成功！', 'success');
+                    closeModal('createApiKeyModal');
+                    document.getElementById('createApiKeyForm').reset();
+                    await loadApiKeys();
+                } else {
+                    showAlert(data.error || '创建失败');
+                }
+            } catch (error) {
+                console.error('Create API key error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        });
+        
+        // 创建 Token
+        document.getElementById('createTokenForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('tokenName').value;
+            const token = document.getElementById('tokenValue').value;
+            const device_id = document.getElementById('deviceId').value;
+            
+            try {
+                const response = await fetch('/api/tokens', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, token, device_id })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Token 添加成功！', 'success');
+                    closeModal('createTokenModal');
+                    document.getElementById('createTokenForm').reset();
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '添加失败');
+                }
+            } catch (error) {
+                console.error('Create token error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        });
+        
+        // 切换 API Key 状态
+        async function toggleApiKey(keyId) {
+            try {
+                const response = await fetch(`/api/keys/${keyId}/toggle`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('API Key 状态已更新', 'success');
+                    await loadApiKeys();
+                } else {
+                    showAlert(data.error || '操作失败');
+                }
+            } catch (error) {
+                console.error('Toggle API key error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 删除 API Key
+        async function deleteApiKey(keyId) {
+            if (!confirm('确定要删除这个 API Key 吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/keys/${keyId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('API Key 已删除', 'success');
+                    await loadApiKeys();
+                } else {
+                    showAlert(data.error || '删除失败');
+                }
+            } catch (error) {
+                console.error('Delete API key error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 切换 Token 状态
+        async function toggleToken(tokenId) {
+            try {
+                const response = await fetch(`/api/tokens/${tokenId}/toggle`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Token 状态已更新', 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '操作失败');
+                }
+            } catch (error) {
+                console.error('Toggle token error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 删除 Token
+        async function deleteToken(tokenId) {
+            if (!confirm('确定要删除这个 Token 吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/tokens/${tokenId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Token 已删除', 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '删除失败');
+                }
+            } catch (error) {
+                console.error('Delete token error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 查询单个 Token 余额
+        async function checkBalance(tokenId) {
+            try {
+                showAlert('正在查询余额...', 'success');
+                
+                const response = await fetch(`/api/tokens/${tokenId}/balance`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`余额查询成功：${data.balance.toFixed(6)} 蒜粒`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '查询失败');
+                }
+            } catch (error) {
+                console.error('Check balance error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 批量查询余额
+        async function batchCheckBalance() {
+            const tokenIds = tokens.map(t => t.id);
+            if (tokenIds.length === 0) {
+                showAlert('没有可查询的 Token');
+                return;
+            }
+            
+            try {
+                showAlert('正在批量查询余额...', 'success');
+                
+                const response = await fetch('/api/tokens/balance/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token_ids: tokenIds })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const results = data.results.results;
+                    const successCount = data.results.success_count;
+                    const failedCount = data.results.failed_count;
+                    
+                    showAlert(`批量查询完成：${successCount} 成功，${failedCount} 失败`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert('批量查询失败');
+                }
+            } catch (error) {
+                console.error('Batch check balance error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 批量模式相关函数
+        function toggleBatchMode(enabled) {
+            const batchActions = document.getElementById('batchActions');
+            if (enabled) {
+                batchActions.classList.add('show');
+            } else {
+                batchActions.classList.remove('show');
+                // 取消所有选择
+                const checkboxes = document.querySelectorAll('input[type="checkbox"][value]');
+                checkboxes.forEach(cb => cb.checked = false);
+                updateSelectedTokens();
+            }
+        }
+        
+        function updateSelectedTokens() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][value]:checked');
+            selectedTokens = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        }
+        
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][value]');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            updateSelectedTokens();
+        }
+        
+        // 批量操作函数
+        async function batchToggleTokens() {
+            if (selectedTokens.length === 0) {
+                showAlert('请选择要操作的 Token');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/tokens/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'toggle', token_ids: selectedTokens })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`批量操作成功，影响 ${data.affected} 个 Token`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '批量操作失败');
+                }
+            } catch (error) {
+                console.error('Batch toggle error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        async function batchDeleteTokens() {
+            if (selectedTokens.length === 0) {
+                showAlert('请选择要删除的 Token');
+                return;
+            }
+            
+            if (!confirm(`确定要删除选中的 ${selectedTokens.length} 个 Token 吗？`)) return;
+            
+            try {
+                const response = await fetch('/api/tokens/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'delete', token_ids: selectedTokens })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`批量删除成功，删除了 ${data.affected} 个 Token`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert(data.error || '批量删除失败');
+                }
+            } catch (error) {
+                console.error('Batch delete error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        async function batchCheckSelectedBalance() {
+            if (selectedTokens.length === 0) {
+                showAlert('请选择要查询余额的 Token');
+                return;
+            }
+            
+            try {
+                showAlert('正在批量查询选中 Token 余额...', 'success');
+                
+                const response = await fetch('/api/tokens/balance/batch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token_ids: selectedTokens })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const results = data.results.results;
+                    const successCount = data.results.success_count;
+                    const failedCount = data.results.failed_count;
+                    
+                    showAlert(`选中 Token 余额查询完成：${successCount} 成功，${failedCount} 失败`, 'success');
+                    await loadTokens();
+                } else {
+                    showAlert('批量查询失败');
+                }
+            } catch (error) {
+                console.error('Batch check selected balance error:', error);
+                showAlert('网络错误，请稍后重试');
+            }
+        }
+        
+        // 页面加载时初始化
+        init();
+    </script>
+</body>
+</html>
