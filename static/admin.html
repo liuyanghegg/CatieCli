@@ -501,10 +501,25 @@
         
         // 初始化
         async function init() {
-            await checkAuth();
-            await loadStats();
-            await loadUsers();
-            await loadTokens();
+            console.log('开始初始化管理员控制台...');
+            try {
+                await checkAuth();
+                console.log('认证检查完成');
+                
+                await loadStats();
+                console.log('统计数据加载完成');
+                
+                await loadUsers();
+                console.log('用户列表加载完成');
+                
+                await loadTokens();
+                console.log('Token列表加载完成');
+                
+                console.log('管理员控制台初始化完成');
+            } catch (error) {
+                console.error('初始化过程中发生错误:', error);
+                showAlert('初始化失败: ' + error.message);
+            }
         }
         
         // 基础功能
@@ -553,8 +568,11 @@
         // 加载系统统计
         async function loadStats() {
             try {
-                document.getElementById('statsLoading').style.display = 'block';
-                document.getElementById('statsGrid').style.display = 'none';
+                const loadingElement = document.getElementById('statsLoading');
+                const gridElement = document.getElementById('statsGrid');
+                
+                if (loadingElement) loadingElement.style.display = 'block';
+                if (gridElement) gridElement.style.display = 'none';
                 
                 const response = await fetch('/api/admin/stats');
                 const data = await response.json();
@@ -570,16 +588,22 @@
                 console.error('Load stats error:', error);
                 showAlert('网络错误，请稍后重试');
             } finally {
-                document.getElementById('statsLoading').style.display = 'none';
-                document.getElementById('statsGrid').style.display = 'grid';
+                const loadingElement = document.getElementById('statsLoading');
+                const gridElement = document.getElementById('statsGrid');
+                
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (gridElement) gridElement.style.display = 'grid';
             }
         }
         
         // 加载用户列表
         async function loadUsers() {
             try {
-                document.getElementById('usersLoading').style.display = 'block';
-                document.getElementById('usersTable').style.display = 'none';
+                const loadingElement = document.getElementById('usersLoading');
+                const tableElement = document.getElementById('usersTable');
+                
+                if (loadingElement) loadingElement.style.display = 'block';
+                if (tableElement) tableElement.style.display = 'none';
                 
                 const response = await fetch('/api/admin/users');
                 const data = await response.json();
@@ -595,14 +619,22 @@
                 console.error('Load users error:', error);
                 showAlert('网络错误，请稍后重试');
             } finally {
-                document.getElementById('usersLoading').style.display = 'none';
-                document.getElementById('usersTable').style.display = 'block';
+                const loadingElement = document.getElementById('usersLoading');
+                const tableElement = document.getElementById('usersTable');
+                
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (tableElement) tableElement.style.display = 'block';
             }
         }
         
         // 渲染用户列表
         function renderUsers() {
             const tbody = document.getElementById('usersBody');
+            if (!tbody) {
+                console.error('usersBody element not found');
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             allUsers.forEach(user => {
@@ -656,8 +688,11 @@
         // 加载Token列表
         async function loadTokens() {
             try {
-                document.getElementById('tokensLoading').style.display = 'block';
-                document.getElementById('tokensTable').style.display = 'none';
+                const loadingElement = document.getElementById('tokensLoading');
+                const tableElement = document.getElementById('tokensTable');
+                
+                if (loadingElement) loadingElement.style.display = 'block';
+                if (tableElement) tableElement.style.display = 'none';
                 
                 const response = await fetch('/api/admin/tokens');
                 const data = await response.json();
@@ -672,14 +707,22 @@
                 console.error('Load tokens error:', error);
                 showAlert('网络错误，请稍后重试');
             } finally {
-                document.getElementById('tokensLoading').style.display = 'none';
-                document.getElementById('tokensTable').style.display = 'block';
+                const loadingElement = document.getElementById('tokensLoading');
+                const tableElement = document.getElementById('tokensTable');
+                
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (tableElement) tableElement.style.display = 'block';
             }
         }
         
         // 渲染Token列表
         function renderTokens() {
             const tbody = document.getElementById('tokensBody');
+            if (!tbody) {
+                console.error('tokensBody element not found');
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             allTokens.forEach(token => {

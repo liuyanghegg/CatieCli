@@ -455,9 +455,22 @@
         
         // 初始化
         async function init() {
-            await checkAuth();
-            await loadApiKeys();
-            await loadTokens();
+            console.log('开始初始化用户控制台...');
+            try {
+                await checkAuth();
+                console.log('认证检查完成');
+                
+                await loadApiKeys();
+                console.log('API Keys加载完成');
+                
+                await loadTokens();
+                console.log('Tokens加载完成');
+                
+                console.log('用户控制台初始化完成');
+            } catch (error) {
+                console.error('初始化过程中发生错误:', error);
+                showAlert('初始化失败: ' + error.message);
+            }
         }
         
         // 检查认证状态
@@ -502,22 +515,43 @@
         // 加载 API Keys
         async function loadApiKeys() {
             try {
+                // 显示加载状态
+                const loadingElement = document.getElementById('apiKeysLoading');
+                const tableElement = document.getElementById('apiKeysTable');
+                
+                if (loadingElement) loadingElement.style.display = 'block';
+                if (tableElement) tableElement.style.display = 'none';
+                
                 const response = await fetch('/api/keys');
                 const data = await response.json();
-                apiKeys = data.api_keys;
-                renderApiKeys();
+                
+                if (response.ok) {
+                    apiKeys = data.api_keys;
+                    renderApiKeys();
+                } else {
+                    showAlert(data.error || '加载 API Keys 失败');
+                }
             } catch (error) {
                 console.error('Load API keys error:', error);
                 showAlert('加载 API Keys 失败');
             } finally {
-                document.getElementById('apiKeysLoading').style.display = 'none';
-                document.getElementById('apiKeysTable').style.display = 'block';
+                // 隐藏加载状态
+                const loadingElement = document.getElementById('apiKeysLoading');
+                const tableElement = document.getElementById('apiKeysTable');
+                
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (tableElement) tableElement.style.display = 'block';
             }
         }
         
         // 渲染 API Keys
         function renderApiKeys() {
             const tbody = document.getElementById('apiKeysBody');
+            if (!tbody) {
+                console.error('apiKeysBody element not found');
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             apiKeys.forEach(key => {
@@ -547,22 +581,43 @@
         // 加载 Tokens
         async function loadTokens() {
             try {
+                // 显示加载状态
+                const loadingElement = document.getElementById('tokensLoading');
+                const tableElement = document.getElementById('tokensTable');
+                
+                if (loadingElement) loadingElement.style.display = 'block';
+                if (tableElement) tableElement.style.display = 'none';
+                
                 const response = await fetch('/api/tokens');
                 const data = await response.json();
-                tokens = data.tokens;
-                renderTokens();
+                
+                if (response.ok) {
+                    tokens = data.tokens;
+                    renderTokens();
+                } else {
+                    showAlert(data.error || '加载 Tokens 失败');
+                }
             } catch (error) {
                 console.error('Load tokens error:', error);
                 showAlert('加载 Tokens 失败');
             } finally {
-                document.getElementById('tokensLoading').style.display = 'none';
-                document.getElementById('tokensTable').style.display = 'block';
+                // 隐藏加载状态
+                const loadingElement = document.getElementById('tokensLoading');
+                const tableElement = document.getElementById('tokensTable');
+                
+                if (loadingElement) loadingElement.style.display = 'none';
+                if (tableElement) tableElement.style.display = 'block';
             }
         }
         
         // 渲染 Tokens
         function renderTokens() {
             const tbody = document.getElementById('tokensBody');
+            if (!tbody) {
+                console.error('tokensBody element not found');
+                return;
+            }
+            
             tbody.innerHTML = '';
             
             tokens.forEach(token => {

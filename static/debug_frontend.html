@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端调试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        .error { color: red; }
+        .success { color: green; }
+        .loading { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 前端调试页面</h1>
+    
+    <div class="section">
+        <h2>登录测试</h2>
+        <button onclick="testLogin()">测试管理员登录</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>API 测试</h2>
+        <button onclick="testAPIs()">测试所有API</button>
+        <div id="apiResult"></div>
+    </div>
+    
+    <div class="section">
+        <h2>控制台日志</h2>
+        <div id="consoleLog"></div>
+    </div>
+
+    <script>
+        // 捕获控制台日志
+        const originalLog = console.log;
+        const originalError = console.error;
+        const logDiv = document.getElementById('consoleLog');
+        
+        function addLog(message, type = 'log') {
+            const p = document.createElement('p');
+            p.className = type;
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(p);
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addLog(args.join(' '), 'success');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addLog(args.join(' '), 'error');
+        };
+        
+        // 测试登录
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            resultDiv.innerHTML = '<p class="loading">正在测试登录...</p>';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ 登录成功</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    
+                    // 测试获取用户信息
+                    const meResponse = await fetch('/api/auth/me');
+                    const meData = await meResponse.json();
+                    
+                    resultDiv.innerHTML += `
+                        <p class="success">✅ 用户信息获取成功</p>
+                        <pre>${JSON.stringify(meData, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ 登录失败</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ 网络错误: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // 测试所有API
+        async function testAPIs() {
+            const resultDiv = document.getElementById('apiResult');
+            resultDiv.innerHTML = '<p class="loading">正在测试API...</p>';
+            
+            const apis = [
+                { name: '系统统计', url: '/api/admin/stats' },
+                { name: '用户列表', url: '/api/admin/users' },
+                { name: 'Token列表', url: '/api/admin/tokens' },
+                { name: '普通用户Token', url: '/api/tokens' },
+                { name: '普通用户API Keys', url: '/api/keys' }
+            ];
+            
+            let results = '';
+            
+            for (const api of apis) {
+                try {
+                    const response = await fetch(api.url);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        results += `
+                            <div>
+                                <p class="success">✅ ${api.name} - 状态码: ${response.status}</p>
+                                <pre>${JSON.stringify(data, null, 2)}</pre>
+                            </div>
+                        `;
+                    } else {
+                        results += `
+                            <div>
+                                <p class="error">❌ ${api.name} - 状态码: ${response.status}</p>
+                                <pre>${JSON.stringify(data, null, 2)}</pre>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    results += `
+                        <div>
+                            <p class="error">❌ ${api.name} - 网络错误: ${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            resultDiv.innerHTML = results;
+        }
+        
+        // 页面加载时的初始化
+        console.log('调试页面已加载');
+        
+        // 检查是否已登录
+        fetch('/api/auth/me')
+            .then(response => response.json())
+            .then(data => {
+                if (data.user) {
+                    console.log('当前用户:', data.user);
+                } else {
+                    console.log('未登录');
+                }
+            })
+            .catch(error => {
+                console.error('检查登录状态失败:', error);
+            });
+    </script>
+</body>
+</html>

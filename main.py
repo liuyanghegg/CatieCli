@@ -1184,6 +1184,11 @@ def admin_page():
     """管理员控制台页面"""
     return app.send_static_file('admin.html')
 
+@app.route('/debug_frontend.html', methods=['GET'])
+def debug_page():
+    """调试页面"""
+    return app.send_static_file('debug_frontend.html')
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
     debug = os.environ.get("DEBUG", "false").lower() == "true"
