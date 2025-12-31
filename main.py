@@ -154,11 +154,10 @@ def log_request_error(error):
         }
     }), 500
 
-# 从环境变量中读取凭据
+# 从环境变量中读取系统配置
 try:
-    api_username = os.environ["API_USERNAME"]
-    api_secret_key = os.environ["API_SECRET_KEY"]
-    access_token = os.environ["ACCESS_TOKEN"]
+    api_username = os.environ.get("API_USERNAME", "web.1.0.beta")
+    api_secret_key = os.environ.get("API_SECRET_KEY", "TkoWuEN8cpDJubb7Zfwxln16NQDZIc8z")
     
     # DEVICE_ID 自动生成（如果未设置）
     device_id = os.environ.get("DEVICE_ID")
@@ -167,8 +166,17 @@ try:
         timestamp = str(int(datetime.now().timestamp() * 1000))
         device_id = f"{random_num}_{timestamp}_{str(random.randint(100000, 999999))}"
         print(f"[INFO] 自动生成 DEVICE_ID: {device_id}")
-except KeyError as e:
-    raise ValueError(f"缺少必要的环境变量: {e.args[0]}")
+        
+    print(f"[INFO] 系统配置加载完成")
+    print(f"[INFO] API_USERNAME: {api_username}")
+    print(f"[INFO] DEVICE_ID: {device_id}")
+    
+except Exception as e:
+    print(f"[ERROR] 系统配置加载失败: {e}")
+    # 使用默认配置
+    api_username = "web.1.0.beta"
+    api_secret_key = "TkoWuEN8cpDJubb7Zfwxln16NQDZIc8z"
+    device_id = f"{random.randint(1000000000000000000, 9999999999999999999)}_{int(datetime.now().timestamp() * 1000)}_{random.randint(100000, 999999)}"
 
 # 会话存储配置
 SESSION_DATA_DIR = os.environ.get("SESSION_DATA_DIR", "./sessions")
@@ -192,14 +200,6 @@ def save_sessions(sessions_data):
             json.dump(sessions_data, f, ensure_ascii=False, indent=2)
     except Exception as e:
         print(f"[WARNING] 保存会话数据失败: {e}")
-
-# 创建 API 客户端实例
-client = create_wenxiaobai_client(
-    username=api_username,
-    secret_key=api_secret_key,
-    access_token=access_token,
-    device_id=device_id
-)
 
 # 会话管理：加载已保存的会话数据
 # 格式: {session_id: {"conversation_id": str, "turn_index": int}}

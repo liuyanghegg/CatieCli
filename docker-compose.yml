@@ -7,19 +7,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # WenXiaoBai API 配置
+      # WenXiaoBai API 配置（内置，无需修改）
       - API_USERNAME=web.1.0.beta
       - API_SECRET_KEY=TkoWuEN8cpDJubb7Zfwxln16NQDZIc8z
-      - ACCESS_TOKEN=${ACCESS_TOKEN:-YOUR_ACCESS_TOKEN_HERE}
-      - DEVICE_ID=${DEVICE_ID:-}
+      - DEVICE_ID=
       
       # 服务配置
       - PORT=8080
       - FLASK_ENV=production
-      - SESSION_DATA_DIR=/app/sessions
+      - SECRET_KEY=change-this-secret-key-in-production
       
-      # 数据库配置
+      # 数据存储配置
       - DATABASE_PATH=/app/data/wenxiaobai_users.db
+      - SESSION_DATA_DIR=/app/sessions
+      - LOG_DIR=/app/logs
       
     volumes:
       # 持久化数据

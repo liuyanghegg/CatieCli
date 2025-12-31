@@ -44,21 +44,20 @@ git clone https://github.com/liuyanghegg/CatieCli.git
 cd CatieCli
 ```
 
-2. **配置环境变量**
-```bash
-cp .env.example .env
-# 编辑 .env 文件，填入你的 ACCESS_TOKEN
-```
-
-3. **启动服务**
+2. **直接启动服务**
 ```bash
 docker-compose up -d
 ```
 
-4. **访问服务**
+3. **访问服务**
 - API 服务: http://localhost:8080
 - 用户控制台: http://localhost:8080/dashboard.html
 - 管理员控制台: http://localhost:8080/admin.html
+
+4. **开始使用**
+- 使用默认管理员账户登录: `admin` / `admin123`
+- 或注册新用户账户
+- 在用户控制台上传你的文小白 Token
 
 ### 方式二：本地运行
 
@@ -67,16 +66,12 @@ docker-compose up -d
 pip install -r requirements.txt
 ```
 
-2. **配置环境变量**
-```bash
-cp .env.example .env
-# 编辑 .env 文件
-```
-
-3. **启动服务**
+2. **启动服务**
 ```bash
 python main.py
 ```
+
+**注意**: 无需配置 ACCESS_TOKEN，系统支持多用户，每个用户可以上传自己的 Token。
 
 ## 📱 用户界面
 
@@ -199,21 +194,47 @@ for chunk in response:
 ## 🐳 Docker 部署
 
 ### 环境变量配置
-```env
-# 必填
-ACCESS_TOKEN=YOUR_ACCESS_TOKEN_HERE
 
-# 可选（已有默认值）
-API_USERNAME=web.1.0.beta
-API_SECRET_KEY=TkoWuEN8cpDJubb7Zfwxln16NQDZIc8z
+系统内置了所有必要的配置，无需手动配置 ACCESS_TOKEN。用户可以通过 Web 界面上传自己的 Token。
+
+**可选配置**:
+```env
+# 服务配置
 PORT=8080
 FLASK_ENV=production
+SECRET_KEY=your-secret-key-change-this-in-production
+
+# 数据存储
+DATABASE_PATH=/app/data/wenxiaobai_users.db
+SESSION_DATA_DIR=/app/sessions
+LOG_DIR=/app/logs
+```
+
+### 一键部署
+
+```bash
+# 克隆项目
+git clone https://github.com/liuyanghegg/CatieCli.git
+cd CatieCli
+
+# 启动服务
+docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
 ```
 
 ### 数据持久化
 - 数据库: `/app/data/wenxiaobai_users.db`
 - 会话数据: `/app/sessions`
 - 日志文件: `/app/logs`
+
+### 使用流程
+1. 访问 http://localhost:8080/admin.html
+2. 使用默认管理员账户登录: `admin` / `admin123`
+3. 创建普通用户或让用户自行注册
+4. 用户登录后上传自己的文小白 Token
+5. 生成 API Key 用于调用 OpenAI 兼容接口
 
 ## 🛠️ 开发和贡献
 
