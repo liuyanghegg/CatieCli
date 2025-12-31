@@ -957,31 +957,6 @@
                 console.error('Batch toggle auto task error:', error);
                 showAlert('网络错误，请稍后重试');
             }
-        }Task() {
-            if (selectedTokens.length === 0) {
-                showAlert('请选择要操作的Token');
-                return;
-            }
-            
-            try {
-                const response = await fetch('/api/admin/tokens/batch', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'toggle-auto-task', token_ids: selectedTokens })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showAlert(`批量切换自动任务成功，影响 ${data.affected} 个Token`, 'success');
-                    await loadTokens();
-                } else {
-                    showAlert(data.error || '批量操作失败');
-                }
-            } catch (error) {
-                console.error('Batch toggle auto task error:', error);
-                showAlert('网络错误，请稍后重试');
-            }
         }
         
         async function batchDeleteTokens() {
